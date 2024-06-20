@@ -211,15 +211,18 @@ impl PostLoginEnvironment {
 
                 Ok(SpawnedEnvironment::Wayland(child))
             }
-            PostLoginEnvironment::Shell { .. } => {
+            PostLoginEnvironment::Shell { script_path } => {
                 info!("Starting TTY shell");
 
                 // TODO: run the desired script file
                 let shell = &user_info.shell;
-                let client = client.arg(shell);
-                info!("Running TTY shell with command `{client:?}`");
+                let client = client
+                    .arg(match script_path {
+                        Some(script_path) => script_path,
+                        None => shell,
+                    });
+                info!("Running `{client:?}`");
                 let child = match client
-                    // .arg(shell)
                     .stdout(Stdio::inherit())
                     .stderr(Stdio::inherit())
                     .stdin(Stdio::inherit())
