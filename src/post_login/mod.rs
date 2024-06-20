@@ -216,8 +216,10 @@ impl PostLoginEnvironment {
 
                 // TODO: run the desired script file
                 let shell = &user_info.shell;
+                let client = client.arg(shell);
+                info!("Running TTY shell with command `{client:?}`");
                 let child = match client
-                    .arg(shell)
+                    // .arg(shell)
                     .stdout(Stdio::inherit())
                     .stderr(Stdio::inherit())
                     .stdin(Stdio::inherit())
