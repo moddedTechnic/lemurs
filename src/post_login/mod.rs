@@ -25,13 +25,13 @@ mod x;
 pub enum PostLoginEnvironment {
     X { xinitrc_path: String },
     Wayland { script_path: String },
-    Shell,
+    Shell { script_path: Option<String> },
 }
 
 impl PostLoginEnvironment {
     pub fn to_xdg_type(&self) -> &'static str {
         match self {
-            Self::Shell => "tty",
+            Self::Shell { .. } => "tty",
             Self::X { .. } => "x11",
             Self::Wayland { .. } => "wayland",
         }
@@ -63,6 +63,7 @@ impl Display for EnvironmentStartError {
 }
 
 impl Error for EnvironmentStartError {}
+
 impl From<XSetupError> for EnvironmentStartError {
     fn from(value: XSetupError) -> Self {
         Self::XSetup(value)
@@ -210,9 +211,10 @@ impl PostLoginEnvironment {
 
                 Ok(SpawnedEnvironment::Wayland(child))
             }
-            PostLoginEnvironment::Shell => {
+            PostLoginEnvironment::Shell { .. } => {
                 info!("Starting TTY shell");
 
+                // TODO: run the desired script file
                 let shell = &user_info.shell;
                 let child = match client
                     .arg(shell)
@@ -440,7 +442,7 @@ pub fn get_envs(config: &Config) -> Vec<(String, PostLoginEnvironment)> {
             info!("Added TTY SHELL because no other environments were found");
         }
 
-        envs.push(("TTYSHELL".to_string(), PostLoginEnvironment::Shell));
+        envs.push(("TTYSHELL".to_string(), PostLoginEnvironment::Shell { script_path: None }));
     }
 
     envs
