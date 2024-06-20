@@ -33,6 +33,7 @@ echo 'Create lemurs configuration directory'
 echo 'NOTE: You still have to move your X or Wayland startup into the proper directories'
 $ROOT_CMD mkdir -p "/etc/lemurs/wms"
 $ROOT_CMD mkdir -p "/etc/lemurs/wayland"
+$ROOT_CMD mkdir -p "/etc/lemurs/scripts"
 if [ $? -ne 0 ]; then exit 1; fi
 
 # Copy over configuration file

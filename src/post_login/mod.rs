@@ -437,6 +437,54 @@ pub fn get_envs(config: &Config) -> Vec<(String, PostLoginEnvironment)> {
         }
     }
 
+    match fs::read_dir(&config.shell.scripts_path) {
+        Ok(paths) => {
+            for path in paths {
+                if let Ok(path) = path {
+                    let file_name = path.file_name().into_string();
+
+                    if let Ok(file_name) = file_name {
+                        if let Ok(metadata) = path.metadata() {
+                            if std::os::unix::fs::MetadataExt::mode(&metadata) & 0o111 == 0 {
+                                warn!(
+                            "'{file_name}' is not executable and therefore not added as an environment",
+                        );
+
+                                continue;
+                            }
+                        }
+
+                        info!("Added environment '{file_name}' from lemurs x11 scripts");
+                        envs.push((
+                            file_name,
+                            PostLoginEnvironment::Shell {
+                                script_path: match path.path().to_str() {
+                                    Some(p) => Some(p.to_string()),
+                                    None => {
+                                        warn!(
+                                    "Skipped item because it was impossible to convert to string"
+                                );
+                                        continue;
+                                    }
+                                },
+                            },
+                        ));
+                    } else {
+                        warn!("Unable to convert OSString to String");
+                    }
+                } else {
+                    warn!("Ignored errorinous path: '{}'", path.unwrap_err());
+                }
+            }
+        }
+        Err(_) => {
+            warn!(
+                "Failed to read from the X folder '{}'",
+                config.x11.scripts_path
+            );
+        }
+    }
+
     if envs.is_empty() || config.environment_switcher.include_tty_shell {
         if envs.is_empty() {
             info!("Added TTY SHELL because no other environments were found");

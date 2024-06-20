@@ -350,3 +350,6 @@ scripts_path = "/etc/lemurs/wayland"
 
 # The directory to use for desktop entries wayland sessions.
 wayland_sessions_path = "/usr/share/wayland-sessions"
+
+[shell]
+scripts_path = "/etc/lemurs/scripts"

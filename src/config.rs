@@ -233,6 +233,7 @@ toml_config_struct! { Config, PartialConfig, RoughConfig,
 
     x11 => X11Config [PartialX11Config, RoughX11Config],
     wayland => WaylandConfig [PartialWaylandConfig, RoughWaylandConfig],
+    shell => ShellConfig [PartialShellConfig, RoughShellConfig],
 }
 
 toml_config_struct! { BackgroundStyleConfig, PartialBackgroundStyleConfig, RoughBackgroundStyleConfig,
@@ -380,6 +381,10 @@ toml_config_struct! { X11Config, PartialX11Config, RoughX11Config,
 toml_config_struct! { WaylandConfig, PartialWaylandConfig, RoughWaylandConfig,
     scripts_path => String,
     wayland_sessions_path => String,
+}
+
+toml_config_struct! { ShellConfig, PartialShellConfig, RoughShellConfig,
+    scripts_path => String,
 }
 
 #[derive(Debug, Clone, Deserialize)]
